@@ -7,31 +7,31 @@ using System.Threading.Tasks;
 
 namespace AsyncHelpers
 {
-    public class AsyncTaskThrottled
+    public class AsyncTaskHelper
     {
-        public async IAsyncEnumerable<ThrottledTaskResult<T>> ExecuteTasksThrottled<T, E>(E[] entities, Func<E, Task<T>> taskFunction,
-             int simultaneousTasks, [EnumeratorCancellation] CancellationToken token, 
+        public async IAsyncEnumerable<ThrottledTaskResult<T>> GetTasksAsTheyComplete<T, E>(E[] entities, Func<E, Task<T>> taskFunction,
+             int simultaneousTasks = int.MaxValue, [EnumeratorCancellation] CancellationToken token = default, 
              Func<T, Task>? onTaskCompleted = null, Func<Task<T>, Task>? onTaskException = null)
         {
             var tasks = new Task<T>[entities.Length];
             for (int i = 0; i < entities.Length; i++)
             {
                 int index = i;
-                tasks[i] = Task.Run<T>(() => {
-                    return taskFunction(entities[i]);
+                tasks[index] = Task.Run<T>(() => {
+                    return taskFunction(entities[index]);
                 });
             }
 
-            await foreach (var completedTask in ExecuteTasksThrottled<T>(tasks, simultaneousTasks, token, onTaskCompleted, onTaskException))
+            await foreach (var completedTask in GetTasksAsTheyComplete<T>(tasks, simultaneousTasks, token, onTaskCompleted, onTaskException))
             {
                 yield return completedTask;
             }
         }
 
-        public async IAsyncEnumerable<ThrottledTaskResult<T>> ExecuteTasksThrottled<T>(Task<T>[] tasks, int simultaneousTasks,
-           [EnumeratorCancellation] CancellationToken token, Func<T, Task>? onTaskCompleted = null, Func<Task<T>, Task>? onTaskException = null)
+        public async IAsyncEnumerable<ThrottledTaskResult<T>> GetTasksAsTheyComplete<T>(Task<T>[] tasks, int simultaneousTasks = int.MaxValue,
+           [EnumeratorCancellation] CancellationToken token = default, Func<T, Task>? onTaskCompleted = null, Func<Task<T>, Task>? onTaskException = null)
         {
-            var semaphore = new SemaphoreSlim(simultaneousTasks);
+            var semaphore = new SemaphoreSlim(simultaneousTasks);            
             using (semaphore)
             {
                 var resultTasks = new Task<ThrottledTaskResult<T>>[tasks.Length];
@@ -51,7 +51,7 @@ namespace AsyncHelpers
         }
 
         private async Task<ThrottledTaskResult<T>> ExecuteTaskThrottled<T>(Task<T> task, SemaphoreSlim semaphore,
-                  CancellationToken token, Func<T, Task>? onTaskCompleted = null, Func<Task<T>, Task>? onTaskException = null)
+                  CancellationToken token = default, Func<T, Task>? onTaskCompleted = null, Func<Task<T>, Task>? onTaskException = null)
         {
             token.ThrowIfCancellationRequested();
             var result = new ThrottledTaskResult<T>();
