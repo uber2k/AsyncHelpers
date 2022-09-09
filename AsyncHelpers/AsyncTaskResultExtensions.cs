@@ -12,7 +12,7 @@ namespace AsyncHelpers
         /// <typeparam name="T">Type of the tasks</typeparam>
         /// <param name="tasks">Tasks to be run</param>
         /// <returns>Array of tasks, that contain the original tasks in the order that they completed</returns>
-        public static Task<Task<T>>[] GetTasksAsTheyComplete<T>(this Task<T>[] tasks,
+        internal static Task<Task<T>>[] GetTasksAsTheyComplete<T>(this Task<T>[] tasks,
             CancellationToken cancellationToken = default)
         {
             var inputTasks = tasks;
@@ -51,7 +51,7 @@ namespace AsyncHelpers
         /// <param name="tasks">Tasks</param>
         /// <param name="cancellationToken">Cacnellation token to halt enumeration</param>
         /// <returns>Tasks sent as parameter, in the order that they completed</returns>
-        public static async IAsyncEnumerable<Task<T>> GetTasksAsTheyCompleteAsync<T>(
+        internal static async IAsyncEnumerable<Task<T>> GetTasksAsTheyCompleteAsync<T>(
             this Task<T>[] tasks, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             foreach (var resultBucket in tasks.GetTasksAsTheyComplete(cancellationToken))
