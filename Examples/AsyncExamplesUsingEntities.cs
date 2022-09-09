@@ -9,6 +9,15 @@ namespace Examples
 {
     internal class AsyncExamplesUsingEntities
     {
+        public async Task Run()
+        {
+            await DownloadAllFilesAtOnce();
+            Console.WriteLine(string.Empty);
+
+            await DownloadAllFilesAtOnceWithParameters();
+            Console.WriteLine(string.Empty);
+        }
+
         public async Task DownloadAllFilesAtOnce()
         {
             var files = new MockRemoteFile[5] 
