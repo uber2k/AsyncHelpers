@@ -9,7 +9,7 @@ namespace AsyncHelpers
 {
     public class AsyncTaskHelper
     {
-        public IAsyncEnumerable<ThrottledTaskResult<R, E>> GetTasksAsTheyComplete<R, E>(E[] entities, Func<E, Task<R>> taskFunction,
+        public IAsyncEnumerable<AsyncHelperResult<R, E>> GetTasksAsTheyComplete<R, E>(E[] entities, Func<E, Task<R>> taskFunction,
              CancellationToken token = default, int simultaneousTasks = int.MaxValue,
              Func<E, Task>? onBeforeTaskStarted = null, Func<E, R, Task>? onTaskCompleted = null, Func<Task<R>, Task>? onTaskException = null) where E : class
         {
@@ -25,7 +25,7 @@ namespace AsyncHelpers
             return GetTasksAsTheyCompleteWithEntities(tasks, entities, token, simultaneousTasks, onBeforeTaskStarted, onTaskCompleted, onTaskException);
         }
 
-        public IAsyncEnumerable<ThrottledTaskResult<R>> GetTasksAsTheyComplete<R>(Task<R>[] tasks, CancellationToken token = default,
+        public IAsyncEnumerable<AsyncHelperResult<R>> GetTasksAsTheyComplete<R>(Task<R>[] tasks, CancellationToken token = default,
            int simultaneousTasks = int.MaxValue,
             Func<Task>? onBeforeTaskStarted = null, 
             Func<R, Task>? onTaskCompleted = null,
@@ -34,7 +34,7 @@ namespace AsyncHelpers
             return GetTasksAsTheyCompleteNoEntities(tasks, token, simultaneousTasks, onBeforeTaskStarted, onTaskCompleted, onTaskException);
         }
 
-        private async IAsyncEnumerable<ThrottledTaskResult<R, E>> GetTasksAsTheyCompleteWithEntities<R, E>(Task<R>[] tasks, E[] entities,
+        private async IAsyncEnumerable<AsyncHelperResult<R, E>> GetTasksAsTheyCompleteWithEntities<R, E>(Task<R>[] tasks, E[] entities,
             [EnumeratorCancellation] CancellationToken token = default, int simultaneousTasks = int.MaxValue,
             Func<E, Task>? onBeforeTaskStarted = null, 
             Func<E, R, Task>? onTaskCompleted = null,
@@ -43,7 +43,7 @@ namespace AsyncHelpers
             var semaphore = new SemaphoreSlim(simultaneousTasks);
             using (semaphore)
             {
-                var resultTasks = new Task<ThrottledTaskResult<R, E>>[tasks.Length];
+                var resultTasks = new Task<AsyncHelperResult<R, E>>[tasks.Length];
                 for (int i = 0; i < tasks.Length; i++)
                 {
                     int index = i;                 
@@ -61,7 +61,7 @@ namespace AsyncHelpers
             }
         }
 
-        private async IAsyncEnumerable<ThrottledTaskResult<R>> GetTasksAsTheyCompleteNoEntities<R>(Task<R>[] tasks,
+        private async IAsyncEnumerable<AsyncHelperResult<R>> GetTasksAsTheyCompleteNoEntities<R>(Task<R>[] tasks,
            [EnumeratorCancellation] CancellationToken token = default, int simultaneousTasks = int.MaxValue,
           Func<Task>? onBeforeTaskStartedNoEntity = null,
           Func<R, Task>? onTaskCompletedNoEntity = null,
@@ -70,7 +70,7 @@ namespace AsyncHelpers
             var semaphore = new SemaphoreSlim(simultaneousTasks);
             using (semaphore)
             {
-                var resultTasks = new Task<ThrottledTaskResult<R>>[tasks.Length];
+                var resultTasks = new Task<AsyncHelperResult<R>>[tasks.Length];
                 for (int i = 0; i < tasks.Length; i++)
                 {
                     int index = i;    
@@ -87,12 +87,12 @@ namespace AsyncHelpers
             }
         }   
 
-        private async Task<ThrottledTaskResult<R, E>> ExecuteTaskThrottled<E, R>(Task<R> task, E? entity, SemaphoreSlim semaphore,
+        private async Task<AsyncHelperResult<R, E>> ExecuteTaskThrottled<E, R>(Task<R> task, E? entity, SemaphoreSlim semaphore,
                 CancellationToken token = default, Func<E, Task>? onBeforeTaskStarted = null,
                 Func<E, R, Task>? onTaskCompleted = null, Func<Task<R>, Task>? onTaskException = null) where E : class
         {
             token.ThrowIfCancellationRequested();
-            var result = new ThrottledTaskResult<R, E>();
+            var result = new AsyncHelperResult<R, E>();
 
             await semaphore.WaitAsync(token);
             try
@@ -111,14 +111,14 @@ namespace AsyncHelpers
             return result;
         }       
 
-        private async Task<ThrottledTaskResult<R>> ExecuteTaskThrottledNoEntity<R>(Task<R> task, SemaphoreSlim semaphore,
+        private async Task<AsyncHelperResult<R>> ExecuteTaskThrottledNoEntity<R>(Task<R> task, SemaphoreSlim semaphore,
                   CancellationToken token = default, 
                   Func<Task>? onBeforeTaskStartedNoEntity = null, 
                   Func<R, Task>? onTaskCompletedNoEntity = null,
                   Func<Task<R>, Task>? onTaskException = null)
         {
             token.ThrowIfCancellationRequested();
-            var result = new ThrottledTaskResult<R>();
+            var result = new AsyncHelperResult<R>();
             
             await semaphore.WaitAsync(token);
             try
@@ -136,7 +136,7 @@ namespace AsyncHelpers
             return result;            
         }
 
-        private static async Task ExecuteTask<E, R>(Task<R> task, E? entity, ThrottledTaskResult<R> result, Func<E, Task>? onBeforeTaskStarted,
+        private static async Task ExecuteTask<E, R>(Task<R> task, E? entity, AsyncHelperResult<R> result, Func<E, Task>? onBeforeTaskStarted,
             Func<Task>? onBeforeTaskStartedNoEntity, Func<E, R, Task>? onTaskCompleted, Func<R, Task>? onTaskCompletedNoEntity = null) where E : class
         {
             if (onBeforeTaskStarted != null && entity != null)
@@ -165,7 +165,7 @@ namespace AsyncHelpers
             }
         }
 
-        private async Task OnExecuteException<R>(Task<R> task, Func<Task<R>, Task>? onTaskException, ThrottledTaskResult<R> result, Exception e)
+        private async Task OnExecuteException<R>(Task<R> task, Func<Task<R>, Task>? onTaskException, AsyncHelperResult<R> result, Exception e)
         {
             result.HadErrors = true;
             result.Exception = e;

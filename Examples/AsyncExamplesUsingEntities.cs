@@ -9,7 +9,7 @@ namespace Examples
 {
     internal class AsyncExamplesUsingEntities
     {
-        public async Task Run()
+        internal async Task Run()
         {
             await DownloadAllFilesAtOnce();
             Console.WriteLine(string.Empty);
@@ -18,15 +18,15 @@ namespace Examples
             Console.WriteLine(string.Empty);
         }
 
-        public async Task DownloadAllFilesAtOnce()
+        internal async Task DownloadAllFilesAtOnce()
         {
             var files = new MockRemoteFile[5] 
             {
                 new MockRemoteFile(){ Seconds = 5 },
-                new MockRemoteFile(){ Seconds = 4 },
+                new MockRemoteFile(){ Seconds = 1 },
                 new MockRemoteFile(){ Seconds = 3 },
                 new MockRemoteFile(){ Seconds = 2 },
-                new MockRemoteFile(){ Seconds = 1}
+                new MockRemoteFile(){ Seconds = 4}
             };
             var asyncHelper = new AsyncTaskHelper();
             int i = 0;
@@ -37,7 +37,7 @@ namespace Examples
             }
         }
 
-        public async Task DownloadAllFilesAtOnceWithParameters()
+        internal async Task DownloadAllFilesAtOnceWithParameters()
         {
             var files = new MockRemoteFile[5]
             {

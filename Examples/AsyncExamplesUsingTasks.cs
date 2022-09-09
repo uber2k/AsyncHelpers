@@ -9,7 +9,7 @@ namespace Examples
 {
     internal class AsyncExamplesUsingTasks
     {
-        public async Task Run()
+        internal async Task Run()
         {
             await ExecuteAllTasksAtOnce();
             Console.WriteLine(string.Empty);
@@ -18,7 +18,7 @@ namespace Examples
             Console.WriteLine(string.Empty);
         }
 
-        public async Task ExecuteAllTasksAtOnce()
+        internal async Task ExecuteAllTasksAtOnce()
         {
             var files = new MockRemoteFile[5]
             {
@@ -40,7 +40,7 @@ namespace Examples
             }
         }
 
-        public async Task ExecuteAllTasksAtOnceWithParameters()
+        internal async Task ExecuteAllTasksAtOnceWithParameters()
         {
             var files = new MockRemoteFile[5]
             {

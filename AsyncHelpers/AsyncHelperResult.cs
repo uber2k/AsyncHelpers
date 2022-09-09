@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AsyncHelpers
 {
-    public class ThrottledTaskResult<T>
+    public class AsyncHelperResult<T>
     {
         public T? Result { get; internal set; }
         public DateTime TaskStarted { get; internal set; }
@@ -15,7 +15,7 @@ namespace AsyncHelpers
         public Exception? Exception { get; internal set; }
     }
 
-    public class ThrottledTaskResult<T, E> : ThrottledTaskResult<T>
+    public class AsyncHelperResult<T, E> : AsyncHelperResult<T>
     {
         public E? Entity { get; internal set; }
     }
