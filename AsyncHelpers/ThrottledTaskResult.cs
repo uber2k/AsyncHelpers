@@ -14,4 +14,9 @@ namespace AsyncHelpers
         public bool HadErrors { get; internal set; }
         public Exception? Exception { get; internal set; }
     }
+
+    public class ThrottledTaskResult<T, E> : ThrottledTaskResult<T>
+    {
+        public E? Entity { get; internal set; }
+    }
 }

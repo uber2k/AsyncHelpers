@@ -8,6 +8,7 @@ namespace Examples
 {
     internal class MockRemoteFile
     {
+        public int Id { get; set; }
         public string? Url { get; set; }
         public int Seconds { get; set; }
 
