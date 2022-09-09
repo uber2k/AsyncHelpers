@@ -30,10 +30,10 @@ namespace Examples
             };
             var asyncHelper = new AsyncTaskHelper();
             int i = 0;
-            await foreach(var file in asyncHelper.GetTasksAsTheyComplete(files, DownloadFile))
+            await foreach(var taskResult in asyncHelper.GetTasksAsTheyComplete(files, DownloadFile))
             {
                 i++;
-                Console.WriteLine($"Task #{i} completed: {file.Result}");
+                Console.WriteLine($"Task completed in {(taskResult.TaskEnded - taskResult.TaskStarted).TotalSeconds}s: {taskResult.Result}");
             }
         }
 

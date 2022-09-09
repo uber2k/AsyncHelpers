@@ -33,10 +33,10 @@ namespace Examples
             var asyncHelper = new AsyncTaskHelper();
 
             int i = 0;
-            await foreach (var file in asyncHelper.GetTasksAsTheyComplete(tasks))
+            await foreach (var taskResult in asyncHelper.GetTasksAsTheyComplete(tasks))
             {
                 i++;
-                Console.WriteLine($"Task #{i} completed: {file.Result}");                
+                Console.WriteLine($"Task #{i} completed: {taskResult.Result}");                
             }
         }
 
